@@ -27,7 +27,7 @@ public class BreedsTest extends BaseTest {
     @BeforeClass
     public void setUp() throws IOException {
 
-        JsonNode breedKeys = TestDataLoader.loadJson("breedKeysDelete.json");
+        JsonNode breedKeys = TestDataLoader.loadJson("breedKeys.json");
 
         BREEDS_REQUIRED_KEYS = new ArrayList<>();
         BREEDS_OPTIONAL_KEYS = new ArrayList<>();

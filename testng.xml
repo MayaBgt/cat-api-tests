@@ -1,0 +1,12 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="Cat API Suite" parallel="classes" thread-count="3">
+
+    <test name="All Tests">
+        <classes>
+            <class name="com.mb.api.tests.BreedsTest"/>
+            <class name="com.mb.api.tests.CategoriesTest"/>
+            <class name="com.mb.api.tests.ImagesTest"/>
+        </classes>
+    </test>
+
+</suite>
