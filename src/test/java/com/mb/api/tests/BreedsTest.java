@@ -1,19 +1,15 @@
 package com.mb.api.tests;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mb.api.tests.utils.TestDataLoader;
 import org.testng.Reporter;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.mb.api.tests.utils.ValidationPatterns.WEIGHT_RANGE;
@@ -82,7 +78,6 @@ public class BreedsTest extends BaseTest {
 
     @Test
     public void weightFormatIsValid() {
-        Pattern rangePattern = Pattern.compile("\\d+\\s*-\\s*\\d+");
 
         IntStream.range(0, breeds.size()).forEach(i -> {
             Map<String, Object> breed = breeds.get(i);

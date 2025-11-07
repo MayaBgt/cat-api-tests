@@ -6,7 +6,6 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import static com.mb.api.tests.utils.ValidationPatterns.IMAGE_URL;
 import static io.restassured.RestAssured.given;

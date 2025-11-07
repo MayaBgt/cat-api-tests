@@ -3,7 +3,6 @@ package com.mb.api.tests;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 

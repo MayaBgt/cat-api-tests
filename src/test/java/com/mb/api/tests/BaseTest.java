@@ -11,7 +11,6 @@ import org.testng.annotations.BeforeClass;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class BaseTest {
 
