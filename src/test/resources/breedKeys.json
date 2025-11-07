@@ -1,0 +1,17 @@
+{
+  "required": [
+    "id", "name", "weight", "temperament", "origin",
+    "country_codes", "country_code", "description",
+    "life_span", "adaptability", "affection_level",
+    "child_friendly", "dog_friendly", "energy_level",
+    "grooming", "health_issues", "intelligence",
+    "shedding_level", "social_needs", "stranger_friendly",
+    "vocalisation", "experimental", "hairless",
+    "natural", "rare", "hypoallergenic"
+  ],
+  "optional": [
+    "cfa_url", "vetstreet_url", "vcahospitals_url", "lap",
+    "alt_names", "rex", "suppressed_tail", "short_legs",
+    "wikipedia_url", "reference_image_id"
+  ]
+}

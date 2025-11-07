@@ -1,12 +1,22 @@
 package com.mb.api.tests;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mb.api.tests.utils.TestDataLoader;
 import org.testng.Reporter;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static com.mb.api.tests.utils.ValidationPatterns.WEIGHT_RANGE;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -15,8 +25,20 @@ public class BreedsTest extends BaseTest {
 
     private List<Map<String, Object>> breeds;
 
+    private static List<String> BREEDS_REQUIRED_KEYS;
+    private static List<String> BREEDS_OPTIONAL_KEYS;
+    private static final List<String> KNOWN_BREEDS = List.of("Abyssinian", "Bengal", "Siberian");
+
     @BeforeClass
-    public void setUp() {
+    public void setUp() throws IOException {
+
+        JsonNode breedKeys = TestDataLoader.loadJson("breedKeys.json");
+
+        BREEDS_REQUIRED_KEYS = new ArrayList<>();
+        BREEDS_OPTIONAL_KEYS = new ArrayList<>();
+
+        breedKeys.get("required").forEach(node -> BREEDS_REQUIRED_KEYS.add(node.asText()));
+        breedKeys.get("optional").forEach(node -> BREEDS_OPTIONAL_KEYS.add(node.asText()));
 
         breeds = given()
                 .spec(requestSpecification)
@@ -74,8 +96,8 @@ public class BreedsTest extends BaseTest {
             String imperial = (String) weight.get("imperial");
             String metric = (String) weight.get("metric");
 
-            assertThat("Invalid imperial format for breed " + i, imperial, matchesPattern(rangePattern));
-            assertThat("Invalid metric format for breed " + i, metric, matchesPattern(rangePattern));
+            assertThat("Invalid imperial format for breed " + i, imperial, matchesPattern(WEIGHT_RANGE));
+            assertThat("Invalid metric format for breed " + i, metric, matchesPattern(WEIGHT_RANGE));
         });
     }
 

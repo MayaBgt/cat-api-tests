@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static com.mb.api.tests.utils.ValidationPatterns.IMAGE_URL;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -54,10 +55,10 @@ public class ImagesTest extends BaseTest{
 
     @Test
     public void urlsAreValid() {
-        Pattern urlPattern = Pattern.compile("^https://cdn2\\.thecatapi\\.com/images/[\\w-]+\\.(jpg|png|gif)$");
+
         for (Map<String, Object> image : images) {
             String url = (String) image.get("url");
-            assertThat("Invalid image URL format: " + url, url, matchesPattern(urlPattern));
+            assertThat("Invalid image URL format: " + url, url, matchesPattern(IMAGE_URL));
         }
     }
 

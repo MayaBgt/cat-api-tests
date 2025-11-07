@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static com.mb.api.tests.utils.ValidationPatterns.CATEGORY_NAME;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -71,7 +72,7 @@ public class CategoriesTest extends BaseTest{
     public void namesFollowPattern() {
         for (Map<String, Object> category : categories) {
             String name = (String) category.get("name");
-            assertThat("Invalid name format: " + name, name, matchesPattern("^[a-z]+$"));
+            assertThat("Invalid name format: " + name, name, matchesPattern(CATEGORY_NAME));
         }
     }
 }
