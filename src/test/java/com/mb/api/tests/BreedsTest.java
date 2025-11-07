@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 import static com.mb.api.tests.utils.ValidationPatterns.WEIGHT_RANGE;
@@ -28,7 +27,7 @@ public class BreedsTest extends BaseTest {
     @BeforeClass
     public void setUp() throws IOException {
 
-        JsonNode breedKeys = TestDataLoader.loadJson("breedKeys.json");
+        JsonNode breedKeys = TestDataLoader.loadJson("breedKeysDelete.json");
 
         BREEDS_REQUIRED_KEYS = new ArrayList<>();
         BREEDS_OPTIONAL_KEYS = new ArrayList<>();
