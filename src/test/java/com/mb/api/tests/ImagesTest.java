@@ -95,8 +95,8 @@ public class ImagesTest extends BaseTest{
     @Test
     public void imagesWithMultipleQueryParams() {
         Map<String, Object> params = Map.of(
-                "limit", 3,
-                "mime_types", "jpg,png"
+                "limit", MULTI_LIMIT,
+                "mime_types", MIME_TYPES
         );
 
         List<Map<String, Object>> result = getImages(params);
