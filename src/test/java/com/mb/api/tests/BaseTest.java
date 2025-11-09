@@ -5,12 +5,16 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.LogConfig;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import org.testng.annotations.BeforeClass;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
+import static io.restassured.RestAssured.given;
 
 public class BaseTest {
 
@@ -49,4 +53,53 @@ public class BaseTest {
                 .distinct()
                 .toList();
     }
+
+    protected List<Map<String, Object>> getListFromEndpoint(String endpoint) {
+        return given()
+                .spec(requestSpecification)
+        .when()
+                .get(endpoint)
+        .then()
+                .spec(responseSpecification)
+                .extract()
+                .jsonPath()
+                .getList("$");
+    }
+
+    protected List<Map<String, Object>> getListFromEndpoint(String endpoint, Map<String, Object> queryParams) {
+        return given()
+                .spec(requestSpecification)
+                .queryParams(queryParams)
+        .when()
+                .get(endpoint)
+        .then()
+                .spec(responseSpecification)
+                .extract()
+                .jsonPath()
+                .getList("$");
+    }
+
+    protected Response getResponseFromEndpoint(String endpoint) {
+        return given()
+                .spec(requestSpecification)
+        .when()
+                .get(endpoint)
+        .then()
+                .spec(responseSpecification)
+                .extract()
+                .response();
+    }
+
+    protected Response getResponseFromEndpoint(String endpoint, Map<String, Object> queryParams) {
+        return given()
+                .spec(requestSpecification)
+                .queryParams(queryParams)
+                .when()
+                .get(endpoint)
+                .then()
+                .spec(responseSpecification)
+                .extract()
+                .response();
+    }
 }
+

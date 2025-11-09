@@ -9,38 +9,34 @@ import java.util.Map;
 
 import static com.mb.api.tests.utils.ValidationPatterns.IMAGE_URL;
 import static io.restassured.RestAssured.given;
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 public class ImagesTest extends BaseTest{
     private List<Map<String,Object>> images;
+    private static final String ENDPOINT = "/images/search";
     private static final int DEFAULT_LIMIT = 5;
     private static final int MULTI_LIMIT = 3;
     private static final String MIME_TYPES = "jpg,png";
+    private static final String ID = "id";
+    private static final String URL = "url";
+    private static final String WIDTH = "width";
+    private static final String HEIGHT = "height";
+    private static final Map<String, Class<?>> IMAGE_FIELDS = Map.of(
+            ID, String.class,
+            URL, String.class,
+            WIDTH, Number.class,
+            HEIGHT, Number.class
+    );
 
-    private List<Map<String, Object>> getImages(Map<String, Object> queryParams) {
-        return given()
-                .spec(requestSpecification)
-                .queryParams(queryParams) // supports multiple params
-                .when()
-                .get("/images/search")
-                .then()
-                .spec(responseSpecification)
-                .extract()
-                .jsonPath()
-                .getList("$");
-    }
     private void assertImageSchema(Map<String, Object> image, int index) {
-        assertThat("Image at index " + index + " missing id", image, hasKey("id"));
-        assertThat("Image at index " + index + " missing url", image, hasKey("url"));
-        assertThat("Image at index " + index + " missing width", image, hasKey("width"));
-        assertThat("Image at index " + index + " missing height", image, hasKey("height"));
-
-        assertThat("Invalid id type at index " + index, image.get("id"), instanceOf(String.class));
-        assertThat("Invalid url type at index " + index, image.get("url"), instanceOf(String.class));
-        assertThat("Invalid width type at index " + index, image.get("width"), instanceOf(Number.class));
-        assertThat("Invalid height type at index " + index, image.get("height"), instanceOf(Number.class));
+        IMAGE_FIELDS.forEach((field, type) -> {
+            assertThat("Image at index " + index + " missing " + field, image, hasKey(field));
+            assertThat("Invalid " + field + " type at index " + index, image.get(field), instanceOf(type));
+        });
     }
+
     private void assertImageUrlValid(Map<String, Object> image) {
         String url = (String) image.get("url");
         assertThat("Invalid image URL: " + url, url, matchesPattern(IMAGE_URL));
@@ -60,12 +56,21 @@ public class ImagesTest extends BaseTest{
     @BeforeClass
     public void setUp() {
         Map<String, Object> defaultParams = Map.of("limit", DEFAULT_LIMIT);
-        images = getImages(defaultParams);
+        images = getListFromEndpoint(ENDPOINT, defaultParams);
     }
     @Test
     public void imagesAreReturned() {
         assertThat("No images returned", images.size(), greaterThan(0));
         Reporter.log("Number of images returned: " + images.size(), true);
+    }
+    @Test
+    public void imageSchemaMatchesJsonSchema() {
+        Map<String, Object> params = Map.of("limit", 1);
+
+        getResponseFromEndpoint(ENDPOINT, params)
+                .then()
+                .assertThat()
+                .body(matchesJsonSchemaInClasspath("schemas/ImageSchema.json"));
     }
     @Test
     public void schemaIsValid() {
@@ -93,13 +98,13 @@ public class ImagesTest extends BaseTest{
         }
     }
     @Test
-    public void imagesWithMultipleQueryParams() {
+    public void imagesWithMultipleQueryParamsAreValid() {
         Map<String, Object> params = Map.of(
                 "limit", MULTI_LIMIT,
                 "mime_types", MIME_TYPES
         );
 
-        List<Map<String, Object>> result = getImages(params);
+        List<Map<String, Object>> result = getListFromEndpoint("/images/search", params);
 
         assertThat("Images not returned", result.size(), greaterThan(0));
         result.forEach(img -> {

@@ -12,17 +12,21 @@ import java.util.Map;
 import java.util.stream.IntStream;
 
 import static com.mb.api.tests.utils.ValidationPatterns.WEIGHT_RANGE;
-import static io.restassured.RestAssured.given;
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 public class BreedsTest extends BaseTest {
 
     private List<Map<String, Object>> breeds;
-
+    private static final String ENDPOINT = "/breeds";
     private static List<String> BREEDS_REQUIRED_KEYS;
     private static List<String> BREEDS_OPTIONAL_KEYS;
     private static final List<String> KNOWN_BREEDS = List.of("Abyssinian", "Bengal", "Siberian");
+    private static final String WEIGHT = "weight";
+    private static final String IMPERIAL = "imperial";
+    private static final String METRIC = "metric";
+    private static final String NAME = "name";
 
     @BeforeClass
     public void setUp() throws IOException {
@@ -35,32 +39,30 @@ public class BreedsTest extends BaseTest {
         breedKeys.get("required").forEach(node -> BREEDS_REQUIRED_KEYS.add(node.asText()));
         breedKeys.get("optional").forEach(node -> BREEDS_OPTIONAL_KEYS.add(node.asText()));
 
-        breeds = given()
-                .spec(requestSpecification)
-        .when()
-                .get("/breeds")
-        .then()
-                .spec(responseSpecification)
-                .extract()
-                .jsonPath()
-                .getList("$");
+        breeds = getListFromEndpoint(ENDPOINT);
     }
 
     @Test
+    public void breedsSchemaMatchesJsonSchema() {
+        getResponseFromEndpoint(ENDPOINT)
+                .then()
+                .assertThat()
+                .body(matchesJsonSchemaInClasspath("schemas/BreedSchema.json"));
+    }
+    @Test
     public void breedsAreReturned() {
         assertThat("No breeds returned", breeds.size(), greaterThan(0));
+        Reporter.log("Number of breeds returned: " + breeds.size(), true);
     }
 
     @Test
     public void requiredKeysArePresent() {
-        for (int i = 0; i < breeds.size(); i++) {
+        IntStream.range(0, breeds.size()).forEach(i -> {
             Map<String, Object> breed = breeds.get(i);
-            for (String key : BREEDS_REQUIRED_KEYS) {
-                assertThat("Breed at index " + i + " is missing required key: " + key,
-                        breed, hasKey(key));
-            }
-            assertThat("Breed at index " + i + " has null name", breed.get("name"), notNullValue());
-        }
+            BREEDS_REQUIRED_KEYS.forEach(key ->
+                    assertThat("Breed at index " + i + " missing key: " + key, breed, hasKey(key))
+            );
+        });
     }
 
     @Test
@@ -81,17 +83,17 @@ public class BreedsTest extends BaseTest {
         IntStream.range(0, breeds.size()).forEach(i -> {
             Map<String, Object> breed = breeds.get(i);
             @SuppressWarnings("unchecked")
-            Map<String, Object> weight = (Map<String, Object>) breed.get("weight");
+            Map<String, Object> weight = (Map<String, Object>) breed.get(WEIGHT);
 
-            assertThat("Breed at index " + i + " missing weight", weight, notNullValue());
-            assertThat("Breed at index " + i + " missing imperial weight", weight, hasKey("imperial"));
-            assertThat("Breed at index " + i + " missing metric weight", weight, hasKey("metric"));
+            assertThat("Missing weight for breed index " + i, weight, notNullValue());
+            assertThat("Missing imperial weight for breed index " + i, weight, hasKey(IMPERIAL));
+            assertThat("Missing metric weight for breed index " + i, weight, hasKey(METRIC));
 
-            String imperial = (String) weight.get("imperial");
-            String metric = (String) weight.get("metric");
+            String imperial = (String) weight.get(IMPERIAL);
+            String metric = (String) weight.get(METRIC);
 
-            assertThat("Invalid imperial format for breed " + i, imperial, matchesPattern(WEIGHT_RANGE));
-            assertThat("Invalid metric format for breed " + i, metric, matchesPattern(WEIGHT_RANGE));
+            assertThat("Invalid imperial weight at index " + i, imperial, matchesPattern(WEIGHT_RANGE));
+            assertThat("Invalid metric weight at index " + i, metric, matchesPattern(WEIGHT_RANGE));
         });
     }
 
@@ -99,7 +101,7 @@ public class BreedsTest extends BaseTest {
     public void knownBreedsArePresent() {
 
         List<String> breedNames = breeds.stream()
-                .map(b -> (String) b.get("name"))
+                .map(b -> (String) b.get(NAME))
                 .toList();
 
         assertThat("Some known breeds are missing", breedNames, hasItems(KNOWN_BREEDS.toArray(new String[0])));

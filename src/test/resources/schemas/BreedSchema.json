@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["id", "name", "temperament", "origin", "weight", "life_span", "description"],
+    "properties": {
+      "id": { "type": "string" },
+      "name": { "type": "string" },
+      "temperament": { "type": "string" },
+      "origin": { "type": "string" },
+      "weight": {
+        "type": "object",
+        "required": ["imperial", "metric"],
+        "properties": {
+          "imperial": { "type": "string" },
+          "metric": { "type": "string" }
+        }
+      },
+      "life_span": { "type": "string" },
+      "description": { "type": "string" },
+      "image": {
+        "type": "object",
+        "required": ["id", "width", "height", "url"],
+        "properties": {
+          "id": { "type": "string" },
+          "width": { "type": "number" },
+          "height": { "type": "number" },
+          "url": { "type": "string", "format": "uri" }
+        }
+      }
+    },
+    "additionalProperties": true
+  }
+}
